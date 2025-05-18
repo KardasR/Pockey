@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
 
     private void ShootPuck()
     {
-        heldPuck.Release(transform.forward * shootingSpeed);
+        heldPuck.Release(skatingDirection * shootingSpeed);
         heldPuck = null;
     }
 
@@ -53,8 +53,6 @@ public class Player : MonoBehaviour
 
     public void TryPickupPuck(Puck puck)
     {
-        Debug.Log("trying to pickup the puck");
-
         if (heldPuck == null && puck.IsPickupable)
         {
             heldPuck = puck;
