@@ -13,11 +13,54 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float sprintModifier;
 
+    [SerializeField]
+    private Transform puckHoldPoint;
+
     private Rigidbody2D body;
 
     private Vector2 skatingDirection;
 
     private bool isSprinting;
+
+    private Puck heldPuck;
+
+    #endregion Fields
+
+    #region Private Methods
+
+    private void Skate()
+    {
+        body.linearVelocity = skatingDirection * (isSprinting ? skatingSpeed * sprintModifier : skatingSpeed);
+    }
+
+    private void ShootPuck()
+    {
+        heldPuck.Release(transform.forward * shootingSpeed);
+        heldPuck = null;
+    }
+
+    private void MovePuck()
+    {
+        if (heldPuck != null)
+        {
+            heldPuck.transform.position = puckHoldPoint.position;
+        }
+    }
+
+    #endregion Private Methods
+
+    #region Public Methods
+
+    public void TryPickupPuck(Puck puck)
+    {
+        Debug.Log("trying to pickup the puck");
+
+        if (heldPuck == null && puck.IsPickupable)
+        {
+            heldPuck = puck;
+            puck.Hold();
+        }
+    }
 
     #endregion
 
@@ -40,12 +83,14 @@ public class Player : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.LeftShift))
             isSprinting = false;
 
-        //body.AddForce(movementDirection, ForceMode2D.Force);
+        if (Input.GetKeyDown(KeyCode.Space) && heldPuck != null)
+            ShootPuck();
     }
 
     void FixedUpdate()
     {
-        body.linearVelocity = skatingDirection * (isSprinting ? skatingSpeed * sprintModifier : skatingSpeed);
+        Skate();
+        MovePuck();
     }
 
     #endregion Core Unity Methods
