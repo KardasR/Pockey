@@ -58,6 +58,16 @@ public class Player : MonoBehaviour
     /// </summary>
     private Puck heldPuck;
 
+    /// <summary>
+    /// Animator to control animations of the player.
+    /// </summary>
+    private Animator animator;
+
+    /// <summary>
+    /// Keep track of this here for when the user is not pressing a key.
+    /// </summary>
+    private bool facingLeft;
+
     #endregion Private Fields
 
     #region Private Methods
@@ -77,6 +87,18 @@ public class Player : MonoBehaviour
     {
         heldPuck.Release(shootingSpeed * (skatingDirection == Vector2.zero ? Vector2.left : skatingDirection));
         heldPuck = null;
+    }
+
+    /// <summary>
+    /// Update the animations so they're the correct direction.
+    /// </summary>
+    private void UpdateAnimator()
+    {
+        bool isMoving = skatingDirection.sqrMagnitude > 0.01f;
+        facingLeft = isMoving ? skatingDirection.x < 0: facingLeft;
+
+        animator.SetBool("isMoving", isMoving);
+        animator.SetBool("facingLeft", facingLeft);
     }
 
     #endregion Private Methods
@@ -104,6 +126,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -115,6 +138,8 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && heldPuck != null)
             ShootPuck();
+
+        UpdateAnimator();
     }
 
     // Called at fixed intervals for physics updates
